@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 //Blogging App using Hooks
 export default function Blog() {
@@ -7,12 +7,26 @@ export default function Blog() {
   const [formData, setFormData] = useState({ title: "", content: "" });
   const [blogs, setBlogs] = useState([]);
 
+  const titleRef = useRef(null);
+  useEffect(() => {
+    titleRef.current.focus();
+  }, []);
+
+  useEffect(() => {
+    if (blogs.length && blogs[0].title) {
+      document.title = blogs[0].title;
+    } else {
+      document.title = "No blogs!";
+    }
+  }, [blogs]);
+
   //Passing the synthetic event as argument to stop refreshing the page on submit
   function handleSubmit(e) {
     e.preventDefault();
-    // if (title && content) {
-    setBlogs([...blogs, { title: formData.title, content: formData.content }]);
+    // if (formData.title && formData.content) {
+    setBlogs([{ title: formData.title, content: formData.content }, ...blogs]);
     setFormData({ title: "", content: "" });
+    titleRef.current.focus();
     //   setTitle("");
     //   setContent("");
     // }
@@ -43,6 +57,7 @@ export default function Blog() {
                   content: formData.content,
                 })
               }
+              ref={titleRef}
             />
           </Row>
 
@@ -52,6 +67,7 @@ export default function Blog() {
               className="input content"
               placeholder="Content of the Blog goes here.."
               value={formData.content}
+              required
               onChange={(e) =>
                 setFormData({ title: formData.title, content: e.target.value })
               }
